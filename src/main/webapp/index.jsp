@@ -32,7 +32,7 @@
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
     <script src="js/function.js"></script>
-    <script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+    <script src="js/jquery.facedetection.min.js"></script>
 </head>
 <body class="layui-form" style="background-color:#eee;padding: 20px;">
 <div class="layui-container">
@@ -47,6 +47,7 @@
                     <div class="layui-fluid">
                         <div class="layui-row">
                             <form action="user/Register" method="post" enctype="multipart/form-data">
+                                <input type="text" id="takeText" hidden="hidden" name="img">
                                 <div class="layui-col-xs12">
                                     <p style="height: 24px; text-indent: 0px; text-align: left; font-weight: bold;">
                                         姓名
@@ -76,7 +77,8 @@
                                             <div id="localImag"><img id="preview"
                                                                      hidden="hidden"
                                                                      width="200px" height="200px"
-                                                                     style="display: block; width: 200px; height: 200px;">
+                                                                     style="display: block; width: 200px; height: 200px;"
+                                            >
                                             </div>
                                         </td>
                                         <td height="101" align="left">
@@ -137,13 +139,7 @@
                                                onclick="registerCheck()">注册</a>
                                         </div>
                             </form>
-                            <form action="user/takePhotoRegister" method="post">
-                                <input type="text" id="takeText" hidden="hidden" name="img">
-                                <input type="submit" id="takeSubmit" hidden="hidden">
-
-                            </form>
                         </div>
-
                     </div>
                 </div>
             </div>

@@ -41,7 +41,8 @@ public class UserController {
                            String phoneNum,
                            MultipartFile registerFile,
                            HttpServletRequest request,
-                           Model model
+                           Model model,
+                           String img
     ) throws IOException {
         //先获取要上传的文件目录
         String path = request.getSession().getServletContext().getRealPath("/upload/");
@@ -51,12 +52,29 @@ public class UserController {
         if (file.exists() == false) {
             file.mkdir();
         }
-        //获取原文件名
-        String filename = registerFile.getOriginalFilename();
         //创建要上传的图片文件，还不存在
-        File picture = new File(file, filename);
-        //写入文件
-        registerFile.transferTo(picture);
+        System.out.println(img);
+        File picture=null;
+        try{
+            if(registerFile.isEmpty()==false){
+                System.out.println("文件模式");
+                //获取原文件名
+                String filename = registerFile.getOriginalFilename();
+                //创建要上传的图片文件，还不存在
+                picture = new File(file, filename);
+                //写入文件
+                registerFile.transferTo(picture);
+            }else{
+                byte[] decode = Base64.decode(base64Process(img));
+                String filename=UUID.randomUUID().toString()+".png";
+                picture = new File(path,"img.png");
+                FileOutputStream fileOutputStream = new FileOutputStream(picture);
+                fileOutputStream.write(decode);
+                fileOutputStream.close();
+            }
+        }catch (Exception e){
+            return "Nophoto";
+        }
         //通过图片来创建面部识别类
         ArcsoftUtils arcsoftUtils = new ArcsoftUtils(picture);
         //获取数据库中的用户数组
@@ -66,10 +84,11 @@ public class UserController {
             if (arcsoftUtils.compareWithFeature(user.getFaceFeature()) > 0.85 || user.getIdcard().equals(idcard)) {
                 //写入返回的错误信息
                 model.addAttribute("msg", ErrorCode.EXIST.getMsg());
+                model.addAttribute("name",user.getName());
                 //卸载引擎
                 arcsoftUtils.close();
                 //返回页面
-                return "success";
+                return "registeFailed";
             }
         }
         //如果执行到这说明没有错，创建新用户
@@ -89,7 +108,7 @@ public class UserController {
         //返回注册成功
         model.addAttribute("msg", "注册成功");
         //返回页面
-        return "success";
+        return "registeSuccess";
     }
 
     /**
@@ -132,7 +151,7 @@ public class UserController {
         return "success";
     }
 
-    @RequestMapping("/takePhotoRegister")
+   /* @RequestMapping("/takePhotoRegister")
     public String takePhotoRegister(String name,
                             String idcard,
                             String phoneNum,
@@ -174,7 +193,7 @@ public class UserController {
             }
         }
         return "takephotoFailed";
-    }
+    }*/
     private String base64Process(String base64Str) {
         if (!StringUtils.isEmpty(base64Str)) {
             String photoBase64 = base64Str.substring(0, 30).toLowerCase();

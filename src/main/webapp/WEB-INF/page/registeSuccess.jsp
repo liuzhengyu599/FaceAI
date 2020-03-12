@@ -8,9 +8,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>takephotoFailed</title>
+    <title>注册成功</title>
 </head>
 <body>
-takephotoFailed
+<script>
+    alert("注册成功！");
+    history.go(-1);
+</script>
 </body>
 </html>

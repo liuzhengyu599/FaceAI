@@ -1,9 +1,15 @@
-src = "https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"
+
+var url2="\"http://code.jquery.com/jquery-2.1.4.min.js\"";
+
+document.write("<script language=javascript src="+url2+"></script>");
+
 let mediaStreamTrack = null; // 视频对象(全局)
 let video;
-
+let img=null;
 //注册打开摄像头
 function openRegistMedia() {
+    if(check()!=true)
+        return;
     let constraints = {
         video: {width: 500, height: 500},
         audio: false
@@ -12,12 +18,11 @@ function openRegistMedia() {
     video = document.getElementById('video');
     let promise = navigator.mediaDevices.getUserMedia(constraints);
     promise.then((mediaStream) => {
-        // mediaStreamTrack = typeof mediaStream.stop === 'function' ? mediaStream : mediaStream.getTracks()[1];
         mediaStreamTrack = mediaStream.getVideoTracks()
         video.srcObject = mediaStream;
-    video.play();
-})
-    ;
+        video.play();
+    });
+    setInterval(takeRegistPhoto,500);
 }
 
 // 注册拍照方法
@@ -28,16 +33,22 @@ function takeRegistPhoto() {
     let ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, 200, 200);
 
-
     // toDataURL  ---  可传入'image/png'---默认, 'image/jpeg'
-    let img = document.getElementById('canvas').toDataURL();
+    img = document.getElementById('canvas').toDataURL();
     // 这里的img就是得到的图片
     console.log('img-----', img);
+    //preview是预览页面
     //document.getElementById('preview').src = img;
-    var docObj = document.getElementById("registerFile01");
-    docObj.files[0] = img;
     document.getElementById('takeText').value = img;
-    document.getElementById('takeSubmit').click();
+    $('#video').faceDetection({
+        data: {img},
+        complete: function (faces) {
+            if (faces.length != 0&&faces[0].confidence>7) {
+               registerCheck();
+            }
+        }
+    });
+
 }
 
 // 注册关闭摄像头
@@ -52,28 +63,14 @@ function closeMedia() {
     document.getElementById('video').srcObject = null;
 }
 
+//注册验证
 function registerCheck() {
-    var objExp = /[\u4E00-\u9FA5]{2,}/;
-    //验证姓名
-    if (objExp.test(document.getElementById("name1").value) == false) {
-        alert("您输入的姓名有误！");
-        return;
-    } else if (document.getElementById("idcard1").value.length != 18) {
-        alert("您输入的身份证有误，请输入18位身份证");
-        return;
-    } else if (Number(document.getElementById("idcard1").value.substring(6, 10) > new Date().getFullYear() + 1)) {
-        alert("您不能在未来出生")
-        return;
-    } else if (Number(document.getElementById("idcard1").value.substring(6, 10)) < 1900) {
-        alert("您的年龄已经超过了120岁")
-        return;
-    } else if (document.getElementById("registerFile01").value == "") {
-        alert("请选择文件")
-        return;
+    if(check()==true&&((img!=null)||document.getElementById("registerFile01").value != "")){
+        document.getElementById("tijiao").click();
     }
-    document.getElementById("tijiao").click();
 }
 
+//上传图片预览
 function setImagePreview() {
     var docObj = document.getElementById("registerFile01");
     var imgObjPreview = document.getElementById("preview");
@@ -103,5 +100,27 @@ function setImagePreview() {
         imgObjPreview.style.display = 'none';
         document.selection.empty();
     }
+    return true;
+}
+
+function check() {
+    var objExp = /[\u4E00-\u9FA5]{2,}/;
+    //验证姓名
+    if (objExp.test(document.getElementById("name1").value) == false) {
+        alert("您输入的姓名有误！");
+        return false;
+    } else if (document.getElementById("idcard1").value.length != 18) {
+        alert("您输入的身份证有误，请输入18位身份证");
+        return false;
+    } else if (Number(document.getElementById("idcard1").value.substring(6, 10) > new Date().getFullYear() + 1)) {
+        alert("您不能在未来出生")
+        return false;
+    } else if (Number(document.getElementById("idcard1").value.substring(6, 10)) < 1900) {
+        alert("您的年龄已经超过了120岁")
+        return false;
+    } /*else if (document.getElementById("registerFile01").value == ""||img===null) {
+        alert("请选择文件或选择扫脸")
+         return false;
+    }*/
     return true;
 }
