@@ -152,67 +152,21 @@
                                     <tr>
                                         <td height="101" align="left">
                                             <div>
-                                                <video id="video2" width="200px" height="200px" autoplay="autoplay"></video>
+                                                <video id="loginVideo" width="200px" height="200px" autoplay="autoplay"></video>
                                             </div>
                                         </td>
                                         <td height="101" align="left">
                                             <div>
-                                                <canvas id="canvas2" width="200px" height="200px" hidden="hidden"></canvas>
+                                                <canvas id="loginCanvas" width="200px" height="200px" hidden="hidden"></canvas>
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                        <td align="left" style="padding-top:10px;">
-                                            <button class="magicalcoder-layupload layui-btn"
-                                                    style="background-color: rgb(30, 144, 255); z-index: 0;"
-                                                    type="button"
-                                                    onclick="openRegistMedia()">开启摄像头
-                                            </button>
-                                        </td>
-                                        <td align="left" style="padding-top:10px;">
-                                            <button class="magicalcoder-layupload layui-btn"
-                                                    style="background-color: rgb(30, 144, 255); z-index: 0;"
-                                                    type="button"
-                                                    onclick="takePhoto()">拍照
-                                            </button>
-                                        </td>
-                                        <td align="left" style="padding-top:10px;">
-                                            <button class="magicalcoder-layupload layui-btn"
-                                                    style="background-color: rgb(30, 144, 255); z-index: 0;"
-                                                    type="button"
-                                                    onclick="closeMedia()">关闭摄像头
-                                            </button>
-                                        </td>
-                                        </td>
-                                    </tr>
                                 </table>
-                                <%--<input type="file" name="loginFile" hidden="hidden" id="upload">
-                                <input type="submit" id="submitLogin" hidden="hidden">--%>
-                                <script>
-                                    function uploadLogin() {
-                                        document.getElementById("upload").click();
-                                    }
-
-                                    /*function submitLogin() {
-                                        if (document.getElementById("upload").value == "") {
-                                            alert("请选择文件");
-                                            return;
-                                        }
-                                        document.getElementById("submitLogin").click();
-                                    }*/
-                                </script>
-                                <%--<button class="magicalcoder-layupload layui-btn"
-                                        style="background-color: rgb(103, 130, 184);" onclick="uploadLogin()"
-                                        type="button">上传图片
-                                </button>--%>
-                                <button class="magicalcoder-layupload layui-btn"
-                                        style="background-color: rgb(103, 130, 184);" onclick="uploadLogin()"
-                                        type="button">人脸登录
-                                </button>
                             </div>
                             <div class="layui-col-xs12 mc-ui-flex-end">
-                                <a class="layui-btn" onclick="submitLogin()">登录</a>
+                                <input type="text" id="loginText" hidden="hidden" name="loginImg">
+                                <input type="submit"  id="loginSubmit" hidden="hidden">
+                                <a class="layui-btn" onclick="openLoginMedia()">开启人脸登录</a>
                             </div>
                         </form>
                     </div>

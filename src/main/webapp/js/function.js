@@ -6,6 +6,9 @@ document.write("<script language=javascript src="+url2+"></script>");
 let mediaStreamTrack = null; // 视频对象(全局)
 let video;
 let img=null;
+
+
+
 //注册打开摄像头
 function openRegistMedia() {
     if(check()!=true)
@@ -67,6 +70,8 @@ function closeMedia() {
 function registerCheck() {
     if(check()==true&&((img!=null)||document.getElementById("registerFile01").value != "")){
         document.getElementById("tijiao").click();
+    }else{
+        alert("是否忘记选择文件？")
     }
 }
 
@@ -118,9 +123,54 @@ function check() {
     } else if (Number(document.getElementById("idcard1").value.substring(6, 10)) < 1900) {
         alert("您的年龄已经超过了120岁")
         return false;
-    } /*else if (document.getElementById("registerFile01").value == ""||img===null) {
-        alert("请选择文件或选择扫脸")
-         return false;
-    }*/
+    }
     return true;
+}
+
+
+
+let loginMediaStreamTrack = null; // 视频对象(全局)
+let loginVideo;
+let loginImg=null;
+
+//登录打开摄像头
+function openLoginMedia() {
+    let constraints = {
+        video: {width: 500, height: 500},
+        audio: false
+    };
+    //获得video摄像头
+    loginVideo = document.getElementById('loginVideo');
+    let promise = navigator.mediaDevices.getUserMedia(constraints);
+    promise.then((mediaStream) => {
+        loginMediaStreamTrack = mediaStream.getVideoTracks()
+        loginVideo.srcObject = mediaStream;
+        loginVideo.play();
+    });
+    setInterval(takeLoginPhoto,10);
+}
+
+// 登录拍照方法
+function takeLoginPhoto() {
+    //获得Canvas对象
+    let loginVideo = document.getElementById('loginVideo');
+    let loginCanvas = document.getElementById('loginCanvas');
+    let ctx = loginCanvas.getContext('2d');
+    ctx.drawImage(loginVideo, 0, 0, 200, 200);
+
+    // toDataURL  ---  可传入'image/png'---默认, 'image/jpeg'
+    loginImg = document.getElementById('loginCanvas').toDataURL();
+    // 这里的img就是得到的图片
+    console.log('img-----', loginImg);
+
+
+    $('#loginVideo').faceDetection({
+        //data: {img},
+        complete: function (faces) {
+            if (faces.length != 0&&faces[0].confidence>7) {
+                document.getElementById('loginText').value = loginImg;
+                document.getElementById('loginSubmit').click();
+            }
+        }
+    });
 }

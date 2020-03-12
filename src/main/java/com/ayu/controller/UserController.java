@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -54,9 +55,9 @@ public class UserController {
         }
         //创建要上传的图片文件，还不存在
         System.out.println(img);
-        File picture=null;
-        try{
-            if(registerFile.isEmpty()==false){
+        File picture = null;
+        try {
+            if (registerFile.isEmpty() == false) {
                 System.out.println("文件模式");
                 //获取原文件名
                 String filename = registerFile.getOriginalFilename();
@@ -64,15 +65,15 @@ public class UserController {
                 picture = new File(file, filename);
                 //写入文件
                 registerFile.transferTo(picture);
-            }else{
+            } else {
                 byte[] decode = Base64.decode(base64Process(img));
-                String filename=UUID.randomUUID().toString()+".png";
-                picture = new File(path,"img.png");
+                String filename = UUID.randomUUID().toString() + ".png";
+                picture = new File(path, "img.png");
                 FileOutputStream fileOutputStream = new FileOutputStream(picture);
                 fileOutputStream.write(decode);
                 fileOutputStream.close();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Nophoto";
         }
         //通过图片来创建面部识别类
@@ -84,7 +85,7 @@ public class UserController {
             if (arcsoftUtils.compareWithFeature(user.getFaceFeature()) > 0.85 || user.getIdcard().equals(idcard)) {
                 //写入返回的错误信息
                 model.addAttribute("msg", ErrorCode.EXIST.getMsg());
-                model.addAttribute("name",user.getName());
+                model.addAttribute("name", user.getName());
                 //卸载引擎
                 arcsoftUtils.close();
                 //返回页面
@@ -114,22 +115,25 @@ public class UserController {
     /**
      * 登录的方法，登录的结果会携带信息跳转
      *
-     * @param request
-     * @param loginFile
      * @param model
      * @return
      * @throws Exception
      */
     @RequestMapping("/Login")
-    public String testFileUpload(HttpServletRequest request,
-                                 MultipartFile loginFile,
-                                 Model model
+    public String Login(
+            HttpServletRequest request,
+            String loginImg,
+            Model model
     ) throws Exception {
-        //获取文件名并生成文件
-        String filename = loginFile.getOriginalFilename();
-        File picture = new File(filename);
-        //写入图片数据，生成面部识别类
-        loginFile.transferTo(picture);
+        //先获取要上传的文件目录
+        String path = request.getSession().getServletContext().getRealPath("/upload/");
+        byte[] decode = Base64.decode(base64Process(loginImg));
+        String filename = UUID.randomUUID().toString() + ".png";
+        File picture = new File(path, "img.png");
+        FileOutputStream fileOutputStream = new FileOutputStream(picture);
+        fileOutputStream.write(decode);
+        fileOutputStream.close();
+
         ArcsoftUtils arcsoftUtils = new ArcsoftUtils(picture);
         //从数据库获取用户
         //List<User> userList = UserService.getUserList();
@@ -151,49 +155,7 @@ public class UserController {
         return "success";
     }
 
-   /* @RequestMapping("/takePhotoRegister")
-    public String takePhotoRegister(String name,
-                            String idcard,
-                            String phoneNum,
-                            String img,
-                            HttpServletRequest request,
-                            Model model
-    ) throws IOException {
-        byte[] decode = Base64.decode(base64Process(img));
-        String path = request.getSession().getServletContext().getRealPath("/upload/");
-        File dir = new File(path);
-        //判断目录是否存在，如果不存在则创建
-        if (dir.exists() == false) {
-            dir.mkdir();
-        }
-        File file = new File(dir,"img.png");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-        //for (int i = 0; i <decode.length ; i++) {
-
-        fileOutputStream.write(decode);
-        if(file==null){
-            return "Nophoto";
-        }
-
-        ArcsoftUtils arcsoftUtils;
-        try{
-            arcsoftUtils = new ArcsoftUtils(file);
-        }catch (Exception e){
-            return "Nophoto";
-        }
-        for (User user : UserService.list) {
-            if(arcsoftUtils.compareWithFeature(user.getFaceFeature())>0.85){
-                //写入返回的错误信息
-                model.addAttribute("msg", ErrorCode.EXIST.getMsg());
-                model.addAttribute("name",user.getName());
-                //卸载引擎
-                arcsoftUtils.close();
-                return "takephotoSucess";
-            }
-        }
-        return "takephotoFailed";
-    }*/
     private String base64Process(String base64Str) {
         if (!StringUtils.isEmpty(base64Str)) {
             String photoBase64 = base64Str.substring(0, 30).toLowerCase();
