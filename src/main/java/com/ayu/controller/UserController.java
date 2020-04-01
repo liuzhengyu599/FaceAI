@@ -1,17 +1,14 @@
 package com.ayu.controller;
 
-import com.arcsoft.face.FaceFeature;
-import com.arcsoft.face.toolkit.ImageFactory;
-import com.arcsoft.face.toolkit.ImageInfo;
-import com.ayu.domain.ErrorCode;
 import com.ayu.domain.User;
 import com.ayu.service.UserService;
 import com.ayu.utils.ArcsoftUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ResponseBody;
 import cn.hutool.core.codec.Base64;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,24 +20,11 @@ import java.util.*;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-
-    /**
-     * 注册的方法，从表单中获取数据
-     *
-     * @param name
-     * @param idcard
-     * @param phoneNum
-     * @param registerFile
-     * @param request
-     * @param model
-     * @return
-     * @throws IOException
-     */
+    ObjectMapper objectMapper=new ObjectMapper();
     @RequestMapping("/Register")
     public String register(String name,
                            String idcard,
                            String phoneNum,
-                           MultipartFile registerFile,
                            HttpServletRequest request,
                            Model model,
                            String img
@@ -57,22 +41,12 @@ public class UserController {
         System.out.println(img);
         File picture = null;
         try {
-            if (registerFile.isEmpty() == false) {
-                System.out.println("文件模式");
-                //获取原文件名
-                String filename = registerFile.getOriginalFilename();
-                //创建要上传的图片文件，还不存在
-                picture = new File(file, filename);
-                //写入文件
-                registerFile.transferTo(picture);
-            } else {
                 byte[] decode = Base64.decode(base64Process(img));
                 String filename = UUID.randomUUID().toString() + ".png";
                 picture = new File(path, "img.png");
                 FileOutputStream fileOutputStream = new FileOutputStream(picture);
                 fileOutputStream.write(decode);
                 fileOutputStream.close();
-            }
         } catch (Exception e) {
             return "Nophoto";
         }
@@ -84,7 +58,7 @@ public class UserController {
             //如果用户相似度大于0.85则认为是同一个人，或者身份证相同
             if (arcsoftUtils.compareWithFeature(user.getFaceFeature()) > 0.85 || user.getIdcard().equals(idcard)) {
                 //写入返回的错误信息
-                model.addAttribute("msg", ErrorCode.EXIST.getMsg());
+                model.addAttribute("msg", "用户已存在");
                 model.addAttribute("name", user.getName());
                 //卸载引擎
                 arcsoftUtils.close();
@@ -104,6 +78,8 @@ public class UserController {
         user.setBirthday(idcard.substring(6, 10) + "-" + idcard.substring(10, 12) + "-" + idcard.substring(12, 14));
         //把用户添加到数据库
         UserService.addUser(user);
+        UserService.list.add(user);
+        UserService.freshList();
         //卸载引擎
         arcsoftUtils.close();
         //返回注册成功
@@ -119,14 +95,21 @@ public class UserController {
      * @return
      * @throws Exception
      */
-    @RequestMapping("/Login")
-    public String Login(
+    @RequestMapping("/LoginAPI")
+    @ResponseBody
+    public String LoginAPI(
             HttpServletRequest request,
             String loginImg,
             Model model
     ) throws Exception {
         //先获取要上传的文件目录
         String path = request.getSession().getServletContext().getRealPath("/upload/");
+        //创建File对象，一会向该路径下上传文件
+        File file = new File(path);
+        //判断目录是否存在，如果不存在则创建
+        if (file.exists() == false) {
+            file.mkdir();
+        }
         byte[] decode = Base64.decode(base64Process(loginImg));
         String filename = UUID.randomUUID().toString() + ".png";
         File picture = new File(path, "img.png");
@@ -145,16 +128,64 @@ public class UserController {
                 arcsoftUtils.close();
                 //删除临时文件
                 picture.delete();
-                return "success";
+                return objectMapper.writeValueAsString(user);
             }
         }
         //删除临时文件，关闭引擎，添加数据返回
         picture.delete();
         arcsoftUtils.close();
         model.addAttribute("msg", "没有此用户");
-        return "success";
+        return objectMapper.writeValueAsString(null);
     }
+    @RequestMapping("/Login")
+    public String Login(
+            HttpServletRequest request,
+            String loginImg,
+            Model model
+    ) throws Exception {
+        //先获取要上传的文件目录
+        String path = request.getSession().getServletContext().getRealPath("/upload/");
+        //创建File对象，一会向该路径下上传文件
+        File file = new File(path);
+        //判断目录是否存在，如果不存在则创建
+        if (file.exists() == false) {
+            file.mkdir();
+        }
+        byte[] decode = Base64.decode(base64Process(loginImg));
+        String filename = UUID.randomUUID().toString() + ".png";
+        File picture = new File(path, "img.png");
+        FileOutputStream fileOutputStream = new FileOutputStream(picture);
+        fileOutputStream.write(decode);
+        fileOutputStream.close();
 
+        ArcsoftUtils arcsoftUtils =null;
+        try {
+            arcsoftUtils= new ArcsoftUtils(picture);
+        }catch (Exception e){
+            return "Nophoto";
+        }
+
+        //从数据库获取用户
+        //List<User> userList = UserService.getUserList();
+        //搜寻是否有此用户
+        for (User user : UserService.list) {
+            //如果有匹配率大于85%的，注入用户信息，返回，关闭引擎
+            if (arcsoftUtils.compareWithFeature(user.getFaceFeature()) > 0.85) {
+                arcsoftUtils.close();
+                //删除临时文件
+                picture.delete();
+                request.setAttribute("name",user.getName());
+                request.setAttribute("idcard",user.getIdcard());
+                System.out.println("before"+user.getIdcard());
+                return "homepage";
+            }
+        }
+        //删除临时文件，关闭引擎，添加数据返回
+        picture.delete();
+        arcsoftUtils.close();
+        model.addAttribute("user", null);
+        return "homepage";
+    }
 
     private String base64Process(String base64Str) {
         if (!StringUtils.isEmpty(base64Str)) {

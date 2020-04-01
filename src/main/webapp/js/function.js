@@ -1,17 +1,16 @@
+var url2 = "\"http://code.jquery.com/jquery-2.1.4.min.js\"";
 
-var url2="\"http://code.jquery.com/jquery-2.1.4.min.js\"";
-
-document.write("<script language=javascript src="+url2+"></script>");
+document.write("<script language=javascript src=" + url2 + "></script>");
 
 let mediaStreamTrack = null; // 视频对象(全局)
 let video;
-let img=null;
-
+let img = null;
+var timer;
 
 
 //注册打开摄像头
 function openRegistMedia() {
-    if(check()!=true)
+    if (check() != true)
         return;
     let constraints = {
         video: {width: 500, height: 500},
@@ -25,7 +24,7 @@ function openRegistMedia() {
         video.srcObject = mediaStream;
         video.play();
     });
-    setInterval(takeRegistPhoto,500);
+    timer = setInterval(takeRegistPhoto, 500);
 }
 
 // 注册拍照方法
@@ -46,8 +45,9 @@ function takeRegistPhoto() {
     $('#video').faceDetection({
         data: {img},
         complete: function (faces) {
-            if (faces.length != 0&&faces[0].confidence>7) {
-               registerCheck();
+            if (faces.length != 0 && faces[0].confidence > 7) {
+                clearInterval(timer);
+                registerCheck();
             }
         }
     });
@@ -68,9 +68,9 @@ function closeMedia() {
 
 //注册验证
 function registerCheck() {
-    if(check()==true&&((img!=null)||document.getElementById("registerFile01").value != "")){
+    if (check() == true && ((img != null) || document.getElementById("registerFile01").value != "")) {
         document.getElementById("tijiao").click();
-    }else{
+    } else {
         alert("是否忘记选择文件？")
     }
 }
@@ -128,10 +128,9 @@ function check() {
 }
 
 
-
 let loginMediaStreamTrack = null; // 视频对象(全局)
 let loginVideo;
-let loginImg=null;
+let loginImg = null;
 
 //登录打开摄像头
 function openLoginMedia() {
@@ -147,7 +146,7 @@ function openLoginMedia() {
         loginVideo.srcObject = mediaStream;
         loginVideo.play();
     });
-    setInterval(takeLoginPhoto,10);
+    timer=setInterval(takeLoginPhoto, 10);
 }
 
 // 登录拍照方法
@@ -167,7 +166,8 @@ function takeLoginPhoto() {
     $('#loginVideo').faceDetection({
         //data: {img},
         complete: function (faces) {
-            if (faces.length != 0&&faces[0].confidence>7) {
+            if (faces.length != 0 && faces[0].confidence > 7) {
+                clearInterval(timer);
                 document.getElementById('loginText').value = loginImg;
                 document.getElementById('loginSubmit').click();
             }

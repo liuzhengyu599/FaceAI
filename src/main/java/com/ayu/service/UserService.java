@@ -18,17 +18,6 @@ public class UserService {
         list=mapper.getUserList();
         sqlSession.close();
     }
-    /**
-     * 获取用户数组
-     * @return
-     */
-    public static List<User> getUserList(){
-        SqlSession sqlSession = MybatisUtils.getSqlSession();
-        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-        List<User> userList = mapper.getUserList();
-        sqlSession.close();
-        return userList;
-    }
 
     /**
      * 添加用户
@@ -39,6 +28,12 @@ public class UserService {
         UserMapper mapper = sqlSession.getMapper(UserMapper.class);
         mapper.addUser(user);
         sqlSession.commit();
+        sqlSession.close();
+    }
+    public static void freshList(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        list = mapper.getUserList();
         sqlSession.close();
     }
 }

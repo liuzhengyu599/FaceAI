@@ -10,5 +10,5 @@ public interface UserMapper {
 
     int addUser(User user);
 
-    User getUserByIdcard(Integer idcard);
+    User getUserByIdcard(String idcard);
 }

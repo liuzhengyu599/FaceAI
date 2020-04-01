@@ -32,7 +32,7 @@
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
     <script src="js/function.js"></script>
-    <script src="js/jquery.facedetection.min.js"></script>
+    <script src="WEB-INF/page/static/js/jquery.facedetection.min.js"></script>
 </head>
 <body class="layui-form" style="background-color:#eee;padding: 20px;">
 <div class="layui-container">
@@ -41,6 +41,7 @@
             <li class="magicalcoder-tab-title layui-this">注册</li>
             <li class="magicalcoder-tab-title">登录</li>
         </ul>
+
         <div class="layui-tab-content">
             <div class="layui-tab-item layui-show">
                 <div class="layui-container">

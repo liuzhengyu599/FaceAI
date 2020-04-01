@@ -1,0 +1,131 @@
+<html>
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>注册</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="static/css/reset.css">
+    <link rel="stylesheet" href="static/css/supersized.css">
+    <link rel="stylesheet" href="static/css/style.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="static/js/html5.js"></script>
+    <![endif]-->
+    <!-- Javascript -->
+    <script src="static/js/jquery-1.8.2.min.js"></script>
+    <script src="static/js/supersized.3.2.7.min.js"></script>
+    <script src="static/js/supersized-init.js"></script>
+    <script src="static/js/scripts.js"></script>
+    <script src="static/js/vue.js"></script>
+    <script src="static/js/jquery.facedetection.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+<div class="page-container">
+    <h1>注册</h1>
+    <form action="user/Register" method="post">
+        <input type="text" v-model="name" name="name" class="name" placeholder="请输入您的姓名！">
+        <input type="text" v-model="idcard" name="idcard" class="idcard" placeholder="请输入您的身份证号码！">
+        <input type="text" v-model="phoneNum" name="phoneNum" class="phoneNum" placeholder="请输入您的手机号码！">
+        <input type="Captcha" class="Captcha" v-model="variCode" placeholder="请输入验证码！">
+        <input type="button" v-model="code" @click="createCode" style="height:40px;width:100px" title='点击更换验证码'/>
+        <button type="button" class="submit_button" @click="openVideo">开启人脸注册</button>
+        <video id="video" width="200px" height="200px" autoplay="autoplay"></video>
+        <canvas id="canvas" width="200px" height="200px" hidden="hidden"></canvas>
+        <a href="loginpage.html">已注册？点我去登录</a>
+        <input type="text" id="takeText" hidden="hidden" name="img">
+        <input type="submit" hidden="hidden" id="register">
+    </form>
+</div>
+<script>
+    var vm = new Vue({
+        el: ".page-container",
+        data: {
+            code:"验证码",
+            variCode:"" ,
+            name:"",
+            idcard:"",
+            phoneNum:"",
+            img:"",
+            timer:null
+        },
+        methods: {
+            createCode: function createCode() {
+                var codeLength = 4;//验证码的长度
+                var t="";
+                var random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');//随机数
+                for (var i = 0; i < codeLength; i++) {//循环操作
+                    var index = Math.floor(Math.random() * 36);//取得随机数的索引（0~35）
+                    t += random[index];//根据索引取得随机数加到code上
+                }
+                this.code=t;//把code值赋给验证码
+            },
+            openVideo:function () {
+                var objExp = /[\u4E00-\u9FA5]{2,}/;
+                //验证姓名
+                if (objExp.test(this.name) == false) {
+                    alert("您输入的姓名有误！");
+                    return ;
+                } else if (this.idcard.length != 18) {
+                    alert("您输入的身份证有误，请输入18位身份证");
+                    return ;
+                } else if (Number(this.idcard.substring(6, 10) > new Date().getFullYear() + 1)) {
+                    alert("您不能在未来出生")
+                    return ;
+                } else if (Number(this.idcard.substring(6, 10)) < 1900) {
+                    alert("您的年龄已经超过了120岁");
+                    return ;
+                }else if(this.code.toUpperCase()!=this.variCode.toUpperCase()){
+                    alert("验证码错误");
+                    return;
+                }
+                let constraints = {
+                    video: {width: 500, height: 500},
+                    audio: false
+                };
+                //获得video摄像头
+                let video = document.getElementById('video');
+                let promise = navigator.mediaDevices.getUserMedia(constraints);
+                promise.then((mediaStream) => {
+                    mediaStreamTrack = mediaStream.getVideoTracks()
+                    video.srcObject = mediaStream;
+                    video.play();
+                    this.timer = setInterval(this.takeRegistPhoto, 500);
+                });
+            },
+            takeRegistPhoto:function () {
+                //获得Canvas对象
+                let video = document.getElementById('video');
+                let canvas = document.getElementById('canvas');
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, 200, 200);
+                let img = document.getElementById('canvas').toDataURL();
+                $('#video').faceDetection({
+                    complete: function (faces) {
+                        // 这里的img就是得到的图片
+                        document.getElementById('takeText').value = img;
+                        console.log(faces[0].confidence );
+                        if (faces.length != 0&&faces[0].confidence > 5) {
+                            clearInterval(this.timer);
+                            document.getElementById("register").click();
+                        }
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+<div style="text-align:center;">
+</div>
+</html>
+

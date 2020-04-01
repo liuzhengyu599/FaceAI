@@ -79,6 +79,7 @@ public class ArcsoftUtils {
         configuration.setSupportLiveness(true);
         errorCode = faceEngine.process(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList, configuration);
         faceEngine.extractFaceFeature(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList.get(0), faceFeature);
+
     }
     //获取性别
     public int getGender(){
@@ -133,12 +134,6 @@ public class ArcsoftUtils {
     public FaceFeature getFaceFeature(){
         FaceFeature faceFeature = new FaceFeature();
         errorCode = faceEngine.extractFaceFeature(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList.get(0), faceFeature);
-        return faceFeature;
-    }
-    //获取人脸特征
-    public FaceFeature getFaceFeature(ImageInfo imageInfo1){
-        FaceFeature faceFeature = new FaceFeature();
-        errorCode = faceEngine.extractFaceFeature(imageInfo1.getImageData(), imageInfo1.getWidth(), imageInfo1.getHeight(), imageInfo1.getImageFormat(), faceInfoList.get(0), faceFeature);
         return faceFeature;
     }
     //销毁引擎

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ayu.dao.RoomMapper">
+    <select id="getRoomList" resultType="com.ayu.domain.Room">
+        select * from room;
+    </select>
+    <update id="changeStatus" parameterType="com.ayu.domain.Room">
+        update room set status=#{status},idcard=#{idcard} where num = #{num};
+    </update>
+    <select id="getRoomListByIdcard" resultType="com.ayu.domain.Room">
+        select * from room where idcard=#{idcard} and status=0;
+    </select>
+</mapper>

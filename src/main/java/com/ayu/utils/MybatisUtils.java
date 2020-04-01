@@ -10,6 +10,7 @@ import java.io.InputStream;
 //sqlSessionFactory --> sqlSession
 public class MybatisUtils {
     private static SqlSessionFactory sqlSessionFactory;
+    SqlSession sqlSession= sqlSessionFactory.openSession();
     static {
         try {
             //使用Mybatis第一步：获取sqlSessionFactory对象
@@ -26,4 +27,5 @@ public class MybatisUtils {
     public static SqlSession getSqlSession(){
         return sqlSessionFactory.openSession();
     }
+
 }

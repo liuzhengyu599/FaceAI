@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>挑选房间</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/bootstrap-theme.min.css">
+    <script src="static/js/vue.js"></script>
+    <script src="static/js/jquery.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div  id="app">
+    <h2 class="text-primary">欢迎您，{{user.name}}</h2>
+    <button type="button" class=" btn btn-group btn-xs" @click="logout">登出</button>
+    <table class="table">
+        <caption>房间列表</caption>
+        <thead>
+        <tr>
+            <th>房间号</th>
+            <th>房间类型</th>
+            <th>价格</th>
+            <th>状态</th>
+            <th><button type="button" id="bth" class="btn-danger" @click="getRoom">刷新</button></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(item) in room" :class="item.status?'success':'danger'">
+            <td>{{item.num}}</td>
+            <td>{{types[item.type]}}</td>
+            <td>{{item.price}}</td>
+            <td>{{item.status?"空闲":"已预订"}}</td>
+            <td>
+                <button type="button" class="btn btn-group" v-show="item.status" @click="bookRoom(item)">预订房间</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            types:["单人间","双人间","多人间"],
+            room: [],
+            user:{name:"阿雨"}
+        },
+        methods: {
+            bookRoom: function (item) {
+                let that=this;
+                axios.post("room/bookRoom",{
+                    idcard:"111222200001010101",
+                    status:Number(!(item.status))
+                }).then(function (response) {
+                    that.room=response.data;
+                })
+            },
+            logout:function () {
+                window.alert("退出成功");
+                history.go(-1);
+            },
+            getRoom:function () {
+                let that =this;
+                axios.get("room/getRoomList").then(function (response) {
+                    that.room=response.data;
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

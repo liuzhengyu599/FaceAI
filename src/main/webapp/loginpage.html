@@ -1,0 +1,91 @@
+<html>
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="static/css/reset.css">
+    <link rel="stylesheet" href="static/css/supersized.css">
+    <link rel="stylesheet" href="static/css/style.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="static/js/html5.js"></script>
+    <![endif]-->
+    <!-- Javascript -->
+    <script src="static/js/jquery-1.8.2.min.js"></script>
+    <script src="static/js/supersized.3.2.7.min.js"></script>
+    <script src="static/js/supersized-init.js"></script>
+    <script src="static/js/scripts.js"></script>
+    <script src="static/js/vue.js"></script>
+    <script src="static/js/jquery.facedetection.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+<div class="page-container">
+    <h1>登录</h1>
+    <form action="user/Login" method="post">
+        <button type="button" class="submit_button" @click="openVideo">开启人脸登录</button>
+        <video id="video" width="200px" height="200px" autoplay="autoplay"></video>
+        <canvas id="canvas" width="200px" height="200px" hidden="hidden"></canvas>
+        <input type="text" id="takeText" hidden="hidden" name="loginImg">
+        <input type="submit" hidden="hidden" id="register">
+    </form>
+</div>
+<script>
+    var vm = new Vue({
+        el: ".page-container",
+        data: {
+            img:"",
+            timer:null
+        },
+        methods: {
+            openVideo:function () {
+                let constraints = {
+                    video: {width: 500, height: 500},
+                    audio: false
+                };
+                //获得video摄像头
+                let video = document.getElementById('video');
+                let promise = navigator.mediaDevices.getUserMedia(constraints);
+                promise.then((mediaStream) => {
+                    mediaStreamTrack = mediaStream.getVideoTracks()
+                    video.srcObject = mediaStream;
+                    video.play();
+                    this.timer = setInterval(this.takeRegistPhoto, 500);
+                });
+            },
+            takeRegistPhoto:function () {
+                //获得Canvas对象
+                let video = document.getElementById('video');
+                let canvas = document.getElementById('canvas');
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, 200, 200);
+                let img = document.getElementById('canvas').toDataURL();
+                $('#video').faceDetection({
+                    complete: function (faces) {
+                        // 这里的img就是得到的图片
+                        document.getElementById('takeText').value = img;
+                        console.log(faces[0].confidence );
+                        if (faces.length != 0&&faces[0].confidence > 7) {
+                            clearInterval(this.timer);
+                            document.getElementById("register").click();
+                        }
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+<div style="text-align:center;">
+</div>
+</html>
+

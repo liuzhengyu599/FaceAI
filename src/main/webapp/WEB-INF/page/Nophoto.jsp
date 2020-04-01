@@ -3,7 +3,7 @@
   User: ayu
   Date: 2020/3/10
   Time: 11:57
-  To change this template use File | Settings | File Templates.
+  发现异常时跳转的页面
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
@@ -12,7 +12,7 @@
 </head>
 <body>
     <script>
-        alert("要么照片不是人，要么你没开摄像头");
+        alert("出现错误");
         history.go(-1);
     </script>
 </body>

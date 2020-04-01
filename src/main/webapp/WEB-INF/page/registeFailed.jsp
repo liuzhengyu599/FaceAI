@@ -1,9 +1,8 @@
 <%--
-  Created by IntelliJ IDEA.
   User: ayu
   Date: 2020/3/10
   Time: 11:40
-  To change this template use File | Settings | File Templates.
+  注册失败，已经存在用户的错误页面
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
