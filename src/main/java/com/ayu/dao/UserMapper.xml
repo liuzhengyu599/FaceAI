@@ -5,7 +5,7 @@
 
 <mapper namespace="com.ayu.dao.UserMapper">
     <insert id="addUser" parameterType="com.ayu.domain.User">
-      insert into user values(#{idcard},#{name},#{birthday},#{gender},#{phoneNum},#{picPath},#{faceFeature});
+      insert into user values(#{idcard},#{name},#{birthday},#{gender},#{phoneNum},#{picPath},#{faceFeature},#{pass});
   </insert>
     <select id="getUserByIdcard" resultType="com.ayu.domain.User">
         select * from user where #{idcard}=idcard;

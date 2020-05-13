@@ -14,6 +14,8 @@ import java.util.List;
 import static com.arcsoft.face.toolkit.ImageFactory.getRGBData;
 
 public class ArcsoftUtils {
+    private final String LinuxPwd = "EYL1qsVSziLDmaiU1aH9V1qhJhfQsxheFQVhchYht1zN";
+    private final String WindowPwd = "EYL1qsVSziLDmaiU1aH9V1qhSpEaUTh5x6ogXsnsH6cY";
     private File picture;//传入的照片
     private FaceEngine faceEngine;//引擎
     private int errorCode;//错误代码
@@ -29,7 +31,7 @@ public class ArcsoftUtils {
         this.picture = picture;
         //从官网获取
         String appId = "5GUFsEVpH7CLuMNpMCTsVrqPEyvPWCYvvY2yJbxLyp1c";
-        String sdkKey = "EYL1qsVSziLDmaiU1aH9V1qhSpEaUTh5x6ogXsnsH6cY";
+        String sdkKey = LinuxPwd;
         File file = new File(ArcsoftUtils.class.getResource("/").getPath());
         faceEngine = new FaceEngine(file.getAbsolutePath()+"/arcsoft_lib");
         //激活引擎

@@ -1,21 +1,23 @@
 package com.ayu.controller;
 
+import cn.hutool.core.codec.Base64;
 import com.ayu.domain.User;
+import com.ayu.domain.androidUser;
 import com.ayu.service.UserService;
 import com.ayu.utils.ArcsoftUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import cn.hutool.core.codec.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/user")
@@ -199,4 +201,46 @@ public class UserController {
             return "";
         }
     }
+
+    @RequestMapping("/androidRegister")
+    @ResponseBody
+    public String androidRegister(String name, String id, String tel, String pass) throws JsonProcessingException {
+        User user = new User();
+        //给用户属性赋值
+        user.setIdcard(id);
+        user.setGender((Integer.parseInt(id.charAt(16) + "")) % 2);
+        user.setName(name);
+        user.setPhoneNum(tel);
+        user.setPicPath("/");
+        user.setBirthday(id.substring(6, 10) + "-" + id.substring(10, 12) + "-" + id.substring(12, 14));
+        user.setPass(pass);
+        //把用户添加到数据库
+        try {
+            UserService.addUser(user);
+        } catch (Exception e) {
+            return "{" + "\"error\"" + ":" + "\"用户名已存在\"" + "}";
+        }
+
+        UserService.list.add(user);
+        UserService.freshList();
+        androidUser androidUser = new androidUser(user);
+
+        return "1";
+    }
+
+    @RequestMapping("/androidLogin")
+    @ResponseBody
+    public String androidLogin(String id, String pass) throws JsonProcessingException {
+        for (User user : UserService.list) {
+            if (user.getIdcard().equals(id)) {
+                if (user.getPass().equals(pass)) {
+                    return objectMapper.writeValueAsString(new androidUser(user));
+                }
+            }
+        }
+        androidUser androidUser = new androidUser();
+        androidUser.setSessionid(null);
+        return objectMapper.writeValueAsString(androidUser);
+    }
+
 }

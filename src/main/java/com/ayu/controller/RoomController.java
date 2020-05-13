@@ -5,7 +5,10 @@ import com.ayu.service.RoomService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
@@ -43,4 +46,24 @@ public class RoomController {
         RoomService.freshList();
         return objectMapper.writeValueAsString(RoomService.list);
     }
+
+    @RequestMapping(value = "/getRoomListByIdcardAndroid")
+    @ResponseBody
+    public String getRoomListByIdcardAndroid(String id) throws JsonProcessingException {
+        RoomService.getRoomListByIdcard(id);
+        return objectMapper.writeValueAsString(RoomService.myList);
+    }
+
+    @RequestMapping(value = "/bookRoomAndroid")
+    @ResponseBody
+    public String bookRoomAndroid(String id, String status, String num) throws JsonProcessingException {
+        Room room = new Room();
+        room.setIdcard(id);
+        room.setStatus(Integer.parseInt(status));
+        room.setNum(Integer.parseInt(num));
+        RoomService.bookRoom(room);
+        RoomService.freshList();
+        return objectMapper.writeValueAsString(RoomService.list);
+    }
+
 }

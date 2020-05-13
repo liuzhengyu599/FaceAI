@@ -1,11 +1,11 @@
 package com.ayu.domain;
 
 public class Room {
-    private String idcard;
-    private int num;
-    private int type;
-    private double price;
-    private int status;
+    private String idcard;      //身份证
+    private int num;            //房间号
+    private int type;           //类型,单人间0双人间1多人间2
+    private double price;       //价格
+    private int status;         //状态,0和1分别是已预订和空闲
 
     public Room() {
     }

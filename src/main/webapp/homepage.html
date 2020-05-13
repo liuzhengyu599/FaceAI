@@ -27,6 +27,7 @@
         </thead>
         <tbody>
         <tr v-for="(item) in room" :class="item.status?'success':'danger'">
+            <td><img :src={{roomImg[item.type]}}></td>
             <td>{{item.num}}</td>
             <td>{{types[item.type]}}</td>
             <td>{{item.price}}</td>
@@ -43,6 +44,7 @@
         el: "#app",
         data: {
             types:["单人间","双人间","多人间"],
+            roomImg: ["static/img/单人间.jpg", "static/img/双人间.jpg", "static/img/多人间.jpg"],
             room: [],
             user:{name:"阿雨"}
         },

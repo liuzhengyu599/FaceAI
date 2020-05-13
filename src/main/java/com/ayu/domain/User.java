@@ -8,7 +8,7 @@ public class User {
     private String phoneNum;        //电话号码
     private String birthday;        //生日
     private byte[] faceFeature;     //脸部信息
-
+    private String pass;            //密码
     public String getBirthday() {
         return birthday;
     }
@@ -63,6 +63,14 @@ public class User {
 
     public void setFaceFeature(byte[] faceFeature) {
         this.faceFeature = faceFeature;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
     }
 
     @Override

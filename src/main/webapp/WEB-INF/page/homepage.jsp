@@ -1,4 +1,3 @@
-<%@ page import="com.ayu.domain.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,10 +18,12 @@
     <script src="https://lib.baomitu.com/echarts/4.6.0/echarts.min.js"></script>
     <script src="http://www.magicalcoder.com/magicaldrag/assets/drag/ui/magicalcoder/1.1.0/magicalcoder.js"></script>
 </head>
-<body class="layui-form" style="background-color:#eee;padding: 20px;">
+<body class="layui-form" style="background-color:#eee;padding: 20px;"
+      background="${pageContext.request.contextPath}/static/img/单人间.jpg">
 <h2 class="text-primary">欢迎您，${name}</h2>
 <h2 hidden="hidden" id="idcard">${idcard}</h2>
 <button type="button" class=" btn btn-group btn-xs" @click="logout">登出</button>
+<a class="btn btn-group-xs" href="../Socket/control">控制器</a>
 <div id="app">
     <div class="layui-tab">
         <ul class="layui-tab-title">
@@ -31,7 +32,7 @@
         </ul>
         <div class="layui-tab-content">
             <div class="layui-tab-item layui-show">
-                <table class="table">
+                <table class="table" style="background: rgba(66, 66, 66, 0.26);">
                     <thead>
                     <tr>
                         <th>房间号</th>
@@ -91,6 +92,7 @@
         el: "#app",
         data: {
             types: ["单人间", "双人间", "多人间"],
+            roomImg: ["static/img/单人间.jpg", "static/img/双人间.jpg", "static/img/多人间.jpg"],
             room: [],
             myroom:[]
         },
@@ -109,7 +111,7 @@
             },
             logout: function () {
                 window.alert("退出成功");
-                window.close();
+                history.go(-1);
             },
             getRoom: function () {
                 let that = this;
